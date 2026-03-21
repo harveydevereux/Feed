@@ -1,35 +1,21 @@
 from feed.utils import months
-from feed.source import Source
+from feed.source import Entry, Source
 
-from dataclasses import asdict
 from bs4 import BeautifulSoup
-from urllib import request
 import datetime
 from pathlib import Path
-import yaml
-from warnings import warn
 
-class PhotosOfTheDay:
+class PhotosOfTheDay(Source):
 
     def __init__(self, data: Path):
-        self._data = data / f"{self.id}.yml"
-        self._entries = {}
-        self._url = "https://www.theguardian.com/news/series/ten-best-photographs-of-the-day"
+        super().__init__(data)
 
     @property
-    def id(self) -> str:
-        return "photosoftheday"
+    def url(self) -> str:
+        return "https://www.theguardian.com/news/series/ten-best-photographs-of-the-day"
 
-    @property
-    def entries(self) -> dict:
-        return self._entries
-
-    def update(self):
-        page = request.urlopen(self._url)
-        data = page.read()
-        soup = BeautifulSoup(data, 'html.parser')
+    def _get_remote_entries(self, soup: BeautifulSoup):
         sections = soup.find_all('section')
-
         remote_entries = {}
 
         for section in sections:
@@ -56,28 +42,6 @@ class PhotosOfTheDay:
                                 picture_url = src["srcset"]
                         break
 
-                remote_entries[date] = Source(url=link, title=title, preview_image_url=picture_url)
+                remote_entries[date] = Entry(url=link, title=title, preview_image_url=picture_url)
 
-        if self._data.exists():
-            with open(self._data, "r", encoding="utf-8") as io:
-                raw_entries = yaml.safe_load(io)
-
-            if raw_entries is not None:
-                self._entries = {}
-                for date in raw_entries:
-                    self._entries[datetime.date.fromisoformat(date)] = Source(**raw_entries[date])
-            else:
-                self._entries = {}
-        else:
-            self._entries = {}
-
-        if len(self._entries) > 0 and len(remote_entries) == 0:
-            warn(f"Unable to get remote entries from {self._url}. But local entries exist.")
-        else:
-            for e in remote_entries:
-                if e not in self._entries:
-                    self._entries[e] = remote_entries[e]
-
-        with open(self._data, "w", encoding="utf-8") as io:
-            data = {str(date): asdict(entry) for date, entry in self._entries.items()}
-            yaml.dump(data, io)
+        return remote_entries

@@ -1,8 +1,8 @@
 from requests import post, exceptions
 
-from feed.source import Source
+from feed.source import Entry
 
-def send(webhook: str, source: Source):
+def send(webhook: str, source: Entry):
 
     data = {}
 
