@@ -1,0 +1,29 @@
+[project]
+name = "feed"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "bs4>=0.0.2",
+    "requests>=2.32.5",
+    "typer>=0.24.1",
+]
+
+[project.scripts]
+feed = "feed.main:app"
+
+[build-system]
+requires = ["uv_build>=0.9.5,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+]
+
+[tool.pytest.ini_options]
+iaddopts = "--cov-report xml"
+pythonpath = ["./src"]
