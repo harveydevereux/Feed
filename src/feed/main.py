@@ -1,12 +1,13 @@
 from typer import Option, Typer
 from typing import Annotated
 from pathlib import Path
-from datetime import datetime
+import datetime
 
 from feed.state import load_state, save_state
 from feed.weekinwildlife import WeekInWildlife
 from feed.photosoftheday import PhotosOfTheDay
 from feed.naturenews import NatureNews
+from feed.bbcinpcitures import BBCInPictures
 from feed.discord import send
 
 app = Typer()
@@ -24,17 +25,18 @@ def update(
 
     state = load_state(data)
 
-    for source in (WeekInWildlife, PhotosOfTheDay, NatureNews):
+    for source in (WeekInWildlife, PhotosOfTheDay, NatureNews, BBCInPictures):
         src = source(data)
         src.update()
 
-        if webhook != None and src.id in state.last_update:
+        if webhook != None:
             entries = src.entries
-            last_update = datetime.fromisoformat(state.last_update[src.id])
-            for entry in entries:
-                if datetime(entry.year, entry.month, entry.day) > last_update:
-                    send(webhook, entries[entry])
-
-        state.last_update[src.id] = str(datetime.now())
+            today = datetime.date.today()
+            for date in entries:
+                if date == today:
+                    for entry in entries[date]:
+                        if entry.url not in state.sent_today:
+                            state.sent_today.add(entry.url)
+                            send(webhook, entry)
 
     save_state(state, data)

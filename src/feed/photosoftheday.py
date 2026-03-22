@@ -42,6 +42,10 @@ class PhotosOfTheDay(Source):
                                 picture_url = src["srcset"]
                         break
 
-                remote_entries[date] = Entry(url=link, title=title, preview_image_url=picture_url)
+                entry = Entry(url=link, title=title, preview_image_url=picture_url)
+                if date in remote_entries:
+                    remote_entries[date].append(entry)
+                else:
+                    remote_entries[date] = [entry]
 
         return remote_entries

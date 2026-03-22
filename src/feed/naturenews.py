@@ -38,6 +38,10 @@ class NatureNews(Source):
                         if src is not None:
                             picture_url = src["src"]
 
-                remote_entries[date] = Entry(url=link, title=title, preview_image_url=picture_url)
+                entry = Entry(url=link, title=title, preview_image_url=picture_url)
+                if date in remote_entries:
+                    remote_entries[date].append(entry)
+                else:
+                    remote_entries[date] = [entry]
 
         return remote_entries

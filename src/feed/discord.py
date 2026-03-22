@@ -11,7 +11,6 @@ def send(webhook: str, source: Entry):
     if source.preview_image_url != "":
         data["embeds"][0]["image"] = {"url": source.preview_image_url}
 
-    print(data)
     result = post(webhook, json = data)
 
     try:

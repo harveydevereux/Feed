@@ -47,7 +47,7 @@ class Source(ABC):
             if raw_entries is not None:
                 self._entries = {}
                 for date in raw_entries:
-                    self._entries[datetime.date.fromisoformat(date)] = Entry(**raw_entries[date])
+                    self._entries[datetime.date.fromisoformat(date)] = [Entry(**entry) for entry in raw_entries[date]]
             else:
                 self._entries = {}
         else:
@@ -61,7 +61,9 @@ class Source(ABC):
                     self._entries[e] = remote_entries[e]
 
         with open(self._data, "w", encoding="utf-8") as io:
-            data = {str(date): asdict(entry) for date, entry in self._entries.items()}
+            data = {}
+            for date, entries in self._entries.items():
+                data[str(date)] = [asdict(entry) for entry in entries]
             yaml.dump(data, io)
 
     @abstractmethod
