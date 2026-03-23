@@ -50,7 +50,7 @@ class BBCInPictures(Source):
                                 if img is not None:
                                     picture_url = img["src"]
                                 title = link.text
-                                link = "https://www.bbc.co.uk/"+link["href"]
+                                link = "https://www.bbc.co.uk"+link["href"]
                                 entry = Entry(url=link, title=title, preview_image_url=picture_url)
                                 if date in remote_entries:
                                     remote_entries[date].append(entry)

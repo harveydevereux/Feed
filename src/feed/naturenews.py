@@ -32,7 +32,7 @@ class NatureNews(Source):
                 picture_url = ""
                 if link is not None:
                     title = link.text
-                    link = f"https://www.nature.com/articles{link['href']}"
+                    link = f"https://www.nature.com{link['href']}"
                     if picture is not None:
                         src = picture.find('img')
                         if src is not None:
