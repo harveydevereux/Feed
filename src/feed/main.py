@@ -7,6 +7,7 @@ from feed.weekinwildlife import WeekInWildlife
 from feed.photosoftheday import PhotosOfTheDay
 from feed.naturenews import NatureNews
 from feed.bbcinpcitures import BBCInPictures
+from feed.bbcfuture import BBCFuture
 from feed.subreddit import SubredditFactory
 from feed.discord import send, send_summary
 
@@ -23,7 +24,7 @@ def update(
     else:
         print(f"Using data store at {data}")
 
-    for source in (WeekInWildlife, PhotosOfTheDay, NatureNews, BBCInPictures,):
+    for source in (WeekInWildlife, PhotosOfTheDay, NatureNews, BBCInPictures, BBCFuture,):
         src = source(data)
         src.get()
 

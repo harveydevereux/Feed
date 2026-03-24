@@ -42,6 +42,10 @@ class Source(ABC):
         return self._entries
 
     @property
+    def urls(self) -> set:
+        return set(entry.url for _, entries in self._entries.items() for entry in entries)
+
+    @property
     @abstractmethod
     def url(self) -> str:
         return NotImplemented
@@ -51,9 +55,6 @@ class Source(ABC):
         data = page.read()
         soup = BeautifulSoup(data, 'html.parser')
         self._remote_entries = self._get_remote_entries(soup)
-
-        if len(self._entries) > 0 and len(self._remote_entries) == 0:
-            warn(f"Unable to get remote entries from {self.url}. But local entries exist.")
 
     def new_entries(self) -> list[Tuple[datetime.date, Entry]]:
         new = []

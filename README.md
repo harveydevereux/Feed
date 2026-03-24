@@ -1,6 +1,6 @@
 ### Sources of interesting, often positive news.
 
-The CLI program is intented to function on an automated schedule (e.g. Cron). New articles are posted to a Discord webhook if supplied on the CLI.
+This CLI program is intented to function on an automated schedule (e.g. Cron). New articles are posted to a Discord webhook if supplied on the CLI.
 
 ## There are two main modes
 
@@ -11,7 +11,7 @@ The CLI program is intented to function on an automated schedule (e.g. Cron). Ne
 feed update --webhook https://discord.com/api/webhooks/YOUR/WEBHOOK/URL
 ```
 
-Currently these include BBC's "In Pictures" series, Nature's News page, and the Guardian's "Week In Wildlife" and "Photos of the Day".
+Currently these include the BBC's "In Pictures" and "Future" series, Nature's News page, and the Guardian's "Week In Wildlife" and "Photos of the Day".
 
 Note URLs stored in `data/` will not be sent multiple times.
 
