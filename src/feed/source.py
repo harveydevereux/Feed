@@ -30,6 +30,10 @@ class Source(ABC):
                     self._entries[datetime.date.fromisoformat(date)] = [Entry(**entry) for entry in raw_entries[date]]
 
     @property
+    def name(self) -> str:
+        return type(self).__name__
+
+    @property
     def id(self) -> str:
         return type(self).__name__.lower()
 

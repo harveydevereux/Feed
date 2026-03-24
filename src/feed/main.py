@@ -31,7 +31,7 @@ def update(
             today = datetime.date.today()
             for (date, entry) in src.new_entries():
                 if date == today:
-                    send(webhook, entry)
+                    send(webhook, entry, src.name)
 
         src.commit()
 

@@ -2,11 +2,11 @@ from requests import post, exceptions
 
 from feed.source import Entry
 
-def send(webhook: str, source: Entry):
+def send(webhook: str, source: Entry, name: str):
 
     data = {}
 
-    data["embeds"] = [{"url": source.url, "title": source.title}]
+    data["embeds"] = [{"url": source.url, "title": name+": "+source.title}]
 
     if source.preview_image_url != "":
         data["embeds"][0]["image"] = {"url": source.preview_image_url}
