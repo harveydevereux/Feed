@@ -1,13 +1,13 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from abc import ABC, abstractmethod
 from pathlib import Path
-from dataclasses import asdict
 from bs4 import BeautifulSoup
 from urllib import request
 import datetime
 from pathlib import Path
 import yaml
 from warnings import warn
+from typing import Tuple
 
 @dataclass(kw_only=True)
 class Entry():
@@ -20,6 +20,14 @@ class Source(ABC):
     def __init__(self, data: Path):
         self._data = data / f"{self.id}.yml"
         self._entries = {}
+        self._remote_entries = {}
+        if self._data.exists():
+            with open(self._data, "r", encoding="utf-8") as io:
+                raw_entries = yaml.safe_load(io)
+
+            if raw_entries is not None:
+                for date in raw_entries:
+                    self._entries[datetime.date.fromisoformat(date)] = [Entry(**entry) for entry in raw_entries[date]]
 
     @property
     def id(self) -> str:
@@ -34,31 +42,33 @@ class Source(ABC):
     def url(self) -> str:
         return NotImplemented
 
-    def update(self):
+    def get(self):
         page = request.urlopen(self.url)
         data = page.read()
         soup = BeautifulSoup(data, 'html.parser')
-        remote_entries = self._get_remote_entries(soup)
+        self._remote_entries = self._get_remote_entries(soup)
 
-        if self._data.exists():
-            with open(self._data, "r", encoding="utf-8") as io:
-                raw_entries = yaml.safe_load(io)
-
-            if raw_entries is not None:
-                self._entries = {}
-                for date in raw_entries:
-                    self._entries[datetime.date.fromisoformat(date)] = [Entry(**entry) for entry in raw_entries[date]]
-            else:
-                self._entries = {}
-        else:
-            self._entries = {}
-
-        if len(self._entries) > 0 and len(remote_entries) == 0:
+        if len(self._entries) > 0 and len(self._remote_entries) == 0:
             warn(f"Unable to get remote entries from {self.url}. But local entries exist.")
-        else:
-            for e in remote_entries:
-                if e not in self._entries:
-                    self._entries[e] = remote_entries[e]
+
+    def new_entries(self) -> list[Tuple[datetime.date, Entry]]:
+        new = []
+        seen_urls = set(entry.url for date in self.entries for entry in self.entries[date])
+        for date, entries in self._remote_entries.items():
+            for entry in entries:
+                if entry.url not in seen_urls:
+                    new.append((date, entry))
+        return new
+
+    def commit(self):
+        seen_urls = set(entry.url for date in self.entries for entry in self.entries[date])
+        for date, entries in self._remote_entries.items():
+            for entry in entries:
+                if entry.url not in seen_urls:
+                    if date in self._entries:
+                        self._entries[date].append(entry)
+                    else:
+                        self._entries[date] = [entry]
 
         with open(self._data, "w", encoding="utf-8") as io:
             data = {}
