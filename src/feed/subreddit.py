@@ -57,5 +57,4 @@ class Subreddit(Source):
                     else:
                         remote_entries[date] = [entry]
 
-
         return remote_entries

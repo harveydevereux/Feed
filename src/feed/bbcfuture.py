@@ -15,6 +15,10 @@ class BBCFuture(Source):
     def url(self) -> str:
         return "https://www.bbc.co.uk/future"
 
+    @property
+    def _remote_can_be_empty(self) -> bool:
+        return True
+
     def _get_remote_entries(self, soup: BeautifulSoup):
         remote_entries = {}
 
